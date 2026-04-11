@@ -260,7 +260,7 @@ Spending Insight:
 # ─── Product / service discovery prompt ───────────────────────────────────────
 
 def build_product_discovery_prompt(
-    nearby_businesses: List[Dict],
+    structured_context: str,
     user_query: str,
     language: str,
 ) -> str:
@@ -285,18 +285,14 @@ def build_product_discovery_prompt(
     lang_instruction, script_rule, _ = _lang_block(language)
 
     # ── Format business listings ───────────────────────────────────────────
-    if nearby_businesses:
-        biz_lines = "\n".join(
-            _format_business(i, b) for i, b in enumerate(nearby_businesses[:10])
-        )
+    if structured_context:
+        biz_lines = structured_context
         db_status = (
-            f"DATABASE RESULT: {len(nearby_businesses)} matching record(s) found "
-            f"for the query '{user_query}'."
+            f"DATABASE RESULT: Matching records found for the query '{user_query}'."
         )
         availability_instruction = (
             "Present these results clearly and help the user pick the best option. "
-            "Recommend the closest / highest-rated match first. "
-            "Mention the business name, distance, and relevant category/product."
+            "Recommend the best match first based on the context provided."
         )
     else:
         biz_lines = "  [NO RECORDS FOUND]"

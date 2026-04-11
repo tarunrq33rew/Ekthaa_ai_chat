@@ -17,4 +17,8 @@ Started: 2026-04-11
   - The project currently relies on a hardcoded `demo_user`; this is the primary bottleneck for production readiness.
   - Appwrite connection requires `APPWRITE_API_KEY` to be set; otherwise, RAG logic fails silently or with log errors.
   - `GLOBAL_BUSINESS` tag is the source of truth for RAG search.
+- **Context Builder Implementation**:
+  - Established a semantic structuring layer (`build_business_context`) that transforms raw JSON results into factual sentences.
+  - Pattern: Search (JSON) -> Refine (JSON) -> Context Builder (Sentences) -> Final Response.
+  - This prevents the final model from having to parse raw JSON, reducing hallucination.
 ---

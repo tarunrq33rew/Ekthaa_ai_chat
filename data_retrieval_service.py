@@ -76,3 +76,47 @@ Return only the filtered and relevant data required to answer the query as a val
         logger.error(f"❌ Error refining business results: {e}")
         # Fail gracefully by returning the original list
         return businesses
+
+def build_business_context(retrieved_data: List[Dict]) -> str:
+    """
+    Converts raw business data into structured factual sentences using the Context Builder prompt.
+    """
+    if not retrieved_data:
+        return ""
+
+    raw_data_str = json.dumps(retrieved_data, indent=2)
+    
+    system_prompt = f"""You are a context builder.
+
+Your task is to convert the retrieved business data into a clean, simple, and structured format that can be easily understood by an AI model.
+
+Strict rules:
+
+Convert raw data into short, clear sentences
+Keep the information factual and structured
+Do not add or assume any extra details
+Do not include irrelevant data
+Do not answer the user’s question yet
+
+Retrieved Data:
+{raw_data_str}
+
+Output:
+Generate a concise and structured context using only the provided data.
+"""
+
+    try:
+        logger.info(f"Building structured context for {len(retrieved_data)} records.")
+        
+        # history is empty as this is a stateless transformation
+        structured_context = call_groq(system_prompt, [], "Convert the data into structured sentences.", language="en")
+        
+        return structured_context.strip()
+
+    except Exception as e:
+        logger.error(f"❌ Error building business context: {e}")
+        # If context builder fails, we return a fallback serialization
+        fallback_lines = []
+        for b in retrieved_data[:5]:
+            fallback_lines.append(f"Business: {b.get('name')}. Category: {b.get('category')}. Distance: {b.get('distance_km')}km.")
+        return "\n".join(fallback_lines)

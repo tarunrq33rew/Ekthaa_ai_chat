@@ -25,7 +25,7 @@ from system_prompt import build_system_prompt, build_product_discovery_prompt, b
 from ai_service import call_ai
 from query_classifier import classify_query
 from rag_service import search_businesses
-from data_retrieval_service import refine_business_results
+from data_retrieval_service import refine_business_results, build_business_context
 
 # ── Init ──────────────────────────────────────────────────────────────────────
 load_dotenv()
@@ -185,10 +185,13 @@ def ai_chat():
         
         if not businesses:
             # Fallback: still use AI to explain why nothing found
-            system_prompt = build_product_discovery_prompt([], message, language)
+            system_prompt = build_product_discovery_prompt("", message, language)
         else:
+            # Structuring: Convert filtered JSON records into structured context
+            structured_context = build_business_context(businesses)
+            
             # Build product-focused prompt with search results
-            system_prompt = build_product_discovery_prompt(businesses, message, language)
+            system_prompt = build_product_discovery_prompt(structured_context, message, language)
         
         # ──────────────────────────────────────────────────────────────────
         # STEP 3: Call AI (Gemini → Groq fallback)
