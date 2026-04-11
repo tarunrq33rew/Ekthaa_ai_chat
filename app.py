@@ -21,7 +21,7 @@ from flask_cors import CORS
 from dotenv import load_dotenv
 
 from context_builder import get_user_context, invalidate_cache
-from system_prompt import build_system_prompt, build_product_discovery_prompt, build_out_of_scope_response
+from system_prompt import build_system_prompt, build_product_discovery_prompt, build_out_of_scope_response, build_final_assistant_prompt
 from ai_service import call_ai
 from query_classifier import classify_query
 from rag_service import search_businesses
@@ -183,15 +183,11 @@ def ai_chat():
         if businesses:
             businesses = refine_business_results(message, businesses)
         
-        if not businesses:
-            # Fallback: still use AI to explain why nothing found
-            system_prompt = build_product_discovery_prompt("", message, language)
-        else:
             # Structuring: Convert filtered JSON records into structured context
             structured_context = build_business_context(businesses)
             
-            # Build product-focused prompt with search results
-            system_prompt = build_product_discovery_prompt(structured_context, message, language)
+            # Build final strict answer prompt using the structured context
+            system_prompt = build_final_assistant_prompt(structured_context, message, language)
         
         # ──────────────────────────────────────────────────────────────────
         # STEP 3: Call AI (Gemini → Groq fallback)

@@ -369,6 +369,49 @@ DATABASE RECORDS (your ONLY allowed source)
     return (prompt + _roman_reminder(language)).strip()
 
 
+def build_final_assistant_prompt(
+    final_context: str,
+    user_query: str,
+    language: str,
+) -> str:
+    """
+    Build a final answer generation prompt using the ultra-strict Ekthaa AI Assistant persona.
+    """
+    lang_instruction, script_rule, _ = _lang_block(language)
+    
+    # Regional failure message
+    no_data_msg = (
+        "No data available" if language == "en" 
+        else "Maaf kijiye, koi data available nahi hai (No data available)." 
+    )
+
+    prompt = f"""LANGUAGE INSTRUCTION (HIGHEST PRIORITY):
+{lang_instruction}
+
+You are Ekthaa AI Assistant.
+
+Your task is to answer the user’s question strictly using the provided context.
+
+Strict rules:
+1. Use only the given context to answer.
+2. {script_rule}
+3. Do NOT generate, assume, or infer any information outside the context.
+4. If the answer is not present in the context, reply exactly: "{no_data_msg}"
+5. Keep the answer short, clear, and factual.
+6. Do not add explanations or extra details.
+
+Context:
+{final_context or "No context provided."}
+
+User Question:
+{user_query}
+
+Answer:
+"""
+
+    return (prompt + _roman_reminder(language)).strip()
+
+
 def _format_business(index: int, b: Dict) -> str:
     """Format a single business record for inclusion in the prompt."""
     name       = b.get("name", "Unknown")
