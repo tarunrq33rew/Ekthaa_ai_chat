@@ -7,6 +7,11 @@ Patterns and standards used in the Ekthaa AI backend.
 - **Fail-Safe Logic**: AI-dependent functions (like refinement) should fail gracefully. If the AI call fails, the system should return the best available non-filtered data rather than crashing.
 - **Statelessness**: The API is largely stateless, relying on the client to pass necessary context (though basic in-memory usage tracking exists).
 
+## Memory Persistence & Agent Continuity (Ralph Pattern)
+- **progress.txt**: Every significant task completion MUST be logged in `progress.txt` under the current date. Include "Learnings for future iterations" to maintain project context.
+- **CLAUDE.md**: Root-level instructions MUST be updated when new project-wide patterns (e.g., new auth headers, database schemas) are established.
+- **prd.json**: The machine-readable task state must be kept in sync with the human-readable ROADMAP.md.
+
 ## Python Style
 - **Naming**: Follows PEP 8 (snake_case for functions and variables).
 - **Type Hinting**: Used in newer modules (e.g., `data_retrieval_service.py`) for better IDE support.

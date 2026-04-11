@@ -1,0 +1,20 @@
+# Ralph Progress Log
+Started: 2026-04-11
+
+## Codebase Patterns
+- **AI Refinement**: All business searches should pass through `data_retrieval_service.refine_business_results` to ensure precision.
+- **RAG Implementation**: Uses Appwrite for storage and Google Generative AI for embeddings.
+- **Query Classification**: Intent is classified into `product_search` or `out_of_scope` before calling the main logic.
+- **Language Policy**: Primary language is English/Hinglish. System translates regional prompts internally.
+
+---
+
+## 2026-04-11 - Baseline Initialization
+- Mapped codebase and initialized GSD framework.
+- Integrated AI refinement layer in `app.py`.
+- Established `.planning/` structure for roadmap and requirements.
+- **Learnings for future iterations:**
+  - The project currently relies on a hardcoded `demo_user`; this is the primary bottleneck for production readiness.
+  - Appwrite connection requires `APPWRITE_API_KEY` to be set; otherwise, RAG logic fails silently or with log errors.
+  - `GLOBAL_BUSINESS` tag is the source of truth for RAG search.
+---

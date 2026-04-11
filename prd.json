@@ -1,0 +1,40 @@
+{
+  "projectName": "Ekthaa AI Backend",
+  "branchName": "feature/auth-integration",
+  "userStories": [
+    {
+      "id": "AUTH-01",
+      "title": "Extract user identity from JWT",
+      "description": "Implement logic in app.py to parse the Authorization header and extract user_id using the existing jwt_secret_key.",
+      "priority": 1,
+      "passes": false,
+      "acceptanceCriteria": [
+        "Auth header is successfully parsed",
+        "Invalid tokens return 401 Unauthorized",
+        "user_id is available in the request context for all protected routes"
+      ]
+    },
+    {
+      "id": "AUTH-02",
+      "title": "Remove hardcoded demo_user",
+      "description": "Global search and personal balance retrieval must use the dynamic user_id instead of 'demo_user'.",
+      "priority": 2,
+      "passes": false,
+      "acceptanceCriteria": [
+        "All references to 'demo_user' are replaced with context-provided user_id",
+        "System still works correctly after refactor"
+      ]
+    },
+    {
+      "id": "SCALE-01",
+      "title": "Persistent Usage Tracking",
+      "description": "Move daily message counts from in-memory dictionary to Appwrite collection.",
+      "priority": 3,
+      "passes": false,
+      "acceptanceCriteria": [
+        "Daily usage survives server restarts",
+        "Usage is tracked per valid user_id"
+      ]
+    }
+  ]
+}
