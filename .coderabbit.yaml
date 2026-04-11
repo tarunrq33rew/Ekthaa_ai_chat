@@ -1,0 +1,40 @@
+# yaml-language-server: $schema=https://coderabbit.ai/schema/v2.json
+
+language: "en-US"
+
+reviews:
+  profile: "chill" # Focused on critical issues and patterns
+  auto_review:
+    enabled: true
+    ignore_drafts: true
+  path_filters:
+    - "!*.planning/**" # Don't review planning documents directly
+    - "!tests/**"
+    - "*.py"
+    - "progress.txt"
+    - "CLAUDE.md"
+
+instructions: >
+  You are an AI code reviewer for the Ekthaa AI Backend. We follow the GSD (Get Shit Done) 
+  and Ralph autonomous agent frameworks.
+  
+  Please follow these high-level instructions for every review:
+  1. **Context Awareness**: Before reviewing any code, always check the `progress.txt` 
+     file for established codebase patterns and recent "Learnings."
+  2. **Framework Compliance**:
+     - Every Pull Request MUST include an update to `progress.txt` under the current 
+       date, documenting what was implemented and what was learned.
+     - Ensure the PR aligns with the active requirements in `ROADMAP.md` and `prd.json`.
+  3. **Technical Focus**:
+     - **Security**: Flag any hardcoded user IDs (like `demo_user`). Demand dynamic 
+       extraction from JWT tokens.
+     - **Performance**: Monitor AI service call patterns. Flag unnecessary nested 
+       AI calls that might increase latency.
+     - **Error Handling**: Ensure AI-related failures fail gracefully (e.g., returning 
+       raw results if refinement fails).
+  4. **Agent Continuity**: If you find a new pattern or convention, suggest adding it 
+     to `CLAUDE.md` to help future human and AI developers.
+
+chat:
+  enabled: true
+  reply_if_mentioned: true
