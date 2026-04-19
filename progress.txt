@@ -20,6 +20,9 @@ Started: 2026-04-11
 - **Context Builder Implementation**:
   - Established a semantic structuring layer (`build_business_context`) that transforms raw JSON results into factual sentences.
   - Pattern: Search (JSON) -> Refine (JSON) -> Context Builder (Sentences) -> Final Assistant (Answer).
-  - This 3-stage semantic pipeline optimizes for accuracy over creativity.
-  - Mandatory "No data available" guardrails are active for out-of-context queries.
+  - ✅ Unified RAG + Appwrite semantic pipeline
+- ✅ Resilient fallback logic (Local Index from data.csv)
+- ✅ Production-ready Appwrite connection with error suppression
+- ✅ Real Project Auth (JWT Middleware + DEBUG_AUTH mode)
+- ✅ Pre-initialized RAG cache on startup
 ---

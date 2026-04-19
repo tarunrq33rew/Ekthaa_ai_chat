@@ -1,0 +1,1752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Ekthaa AI — Smart Assistant</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    :root {
+      --primary: #8b5cf6;
+      --primary-light: #a78bfa;
+      --primary-dark: #7c3aed;
+      --secondary: #6366f1;
+      --accent: #06b6d4;
+      --success: #10b981;
+      --success-light: #34d399;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      
+      --bg-primary: #0a0a1a;
+      --bg-secondary: #111128;
+      --bg-card: rgba(255, 255, 255, 0.03);
+      --bg-glass: rgba(255, 255, 255, 0.05);
+      --border-color: rgba(139, 92, 246, 0.15);
+      --border-glow: rgba(139, 92, 246, 0.3);
+      
+      --text-primary: #f8fafc;
+      --text-secondary: #cbd5e1;
+      --text-muted: #64748b;
+      
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.4);
+      --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.5);
+      --shadow-glow: 0 0 40px rgba(139, 92, 246, 0.2);
+      
+      --radius-sm: 12px;
+      --radius-md: 16px;
+      --radius-lg: 24px;
+      --radius-xl: 32px;
+      
+      --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-smooth: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-bounce: 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      height: 100vh;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Animated Background */
+    .bg-animation {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .bg-gradient {
+      position: absolute;
+      width: 150%;
+      height: 150%;
+      top: -25%;
+      left: -25%;
+      background: 
+        radial-gradient(circle at 20% 20%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(6, 182, 212, 0.06) 0%, transparent 50%);
+      animation: bgFloat 20s ease-in-out infinite;
+    }
+
+    @keyframes bgFloat {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      33% { transform: translate(30px, -30px) rotate(1deg); }
+      66% { transform: translate(-20px, 20px) rotate(-1deg); }
+    }
+
+    .grid-overlay {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(rgba(139, 92, 246, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(139, 92, 246, 0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse at center, black 0%, transparent 70%);
+      -webkit-mask-image: radial-gradient(ellipse at center, black 0%, transparent 70%);
+    }
+
+    /* Main Container */
+    .app-container {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* Header */
+    header {
+      background: linear-gradient(180deg, rgba(17, 17, 40, 0.95) 0%, rgba(17, 17, 40, 0.85) 100%);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      position: relative;
+      z-index: 100;
+      animation: slideDown 0.6s var(--transition-bounce);
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-100%);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .logo-container {
+      position: relative;
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-bg {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      border-radius: var(--radius-md);
+      animation: logoPulse 3s ease-in-out infinite;
+    }
+
+    @keyframes logoPulse {
+      0%, 100% { 
+        box-shadow: 0 0 20px rgba(139, 92, 246, 0.4), 0 0 40px rgba(139, 92, 246, 0.2); 
+        transform: scale(1);
+      }
+      50% { 
+        box-shadow: 0 0 30px rgba(139, 92, 246, 0.6), 0 0 60px rgba(139, 92, 246, 0.3); 
+        transform: scale(1.02);
+      }
+    }
+
+    .logo {
+      font-size: 26px;
+      position: relative;
+      z-index: 1;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-3px); }
+    }
+
+    .header-info h1 {
+      font-size: 18px;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--text-primary) 0%, var(--primary-light) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.3px;
+      line-height: 1.2;
+    }
+
+    .header-info p {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-top: 2px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: var(--bg-glass);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-xl);
+      font-size: 12px;
+      font-weight: 600;
+      backdrop-filter: blur(10px);
+      transition: all var(--transition-fast);
+    }
+
+    .status-badge:hover {
+      border-color: var(--border-glow);
+      transform: scale(1.02);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--danger);
+      position: relative;
+    }
+
+    .status-dot.online {
+      background: var(--success);
+      animation: statusPulse 2s ease-in-out infinite;
+    }
+
+    .status-dot::after {
+      content: '';
+      position: absolute;
+      inset: -3px;
+      border-radius: 50%;
+      background: inherit;
+      opacity: 0.3;
+      animation: statusRing 2s ease-in-out infinite;
+    }
+
+    @keyframes statusPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
+    @keyframes statusRing {
+      0%, 100% { transform: scale(1); opacity: 0.3; }
+      50% { transform: scale(1.5); opacity: 0; }
+    }
+
+    /* Config Bar */
+    .config-bar {
+      background: rgba(17, 17, 40, 0.9);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      animation: slideDown 0.6s var(--transition-bounce) 0.1s both;
+    }
+
+    .demo-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(52, 211, 153, 0.1) 100%);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: var(--radius-xl);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--success-light);
+      white-space: nowrap;
+      animation: badgeShine 3s ease-in-out infinite;
+    }
+
+    @keyframes badgeShine {
+      0%, 100% { box-shadow: 0 0 10px rgba(16, 185, 129, 0.2); }
+      50% { box-shadow: 0 0 20px rgba(16, 185, 129, 0.4); }
+    }
+
+    .config-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .config-group label {
+      font-size: 10px;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .config-group select {
+      appearance: none;
+      -webkit-appearance: none;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      border: none;
+      border-radius: var(--radius-sm);
+      color: white;
+      padding: 8px 32px 8px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      background-size: 14px;
+    }
+
+    .config-group select:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(139, 92, 246, 0.35);
+    }
+
+    .config-group select:active {
+      transform: translateY(0);
+    }
+
+    /* Quick Actions */
+    .quick-actions {
+      background: rgba(17, 17, 40, 0.7);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: 10px 20px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      animation: slideDown 0.6s var(--transition-bounce) 0.2s both;
+    }
+
+    .quick-actions::-webkit-scrollbar {
+      display: none;
+    }
+
+    .quick-btn {
+      scroll-snap-align: start;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 16px;
+      background: var(--bg-glass);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-xl);
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      white-space: nowrap;
+      flex-shrink: 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .quick-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      opacity: 0;
+      transition: opacity var(--transition-fast);
+    }
+
+    .quick-btn:hover {
+      color: white;
+      border-color: var(--primary);
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 8px 24px rgba(139, 92, 246, 0.3);
+    }
+
+    .quick-btn:hover::before {
+      opacity: 1;
+    }
+
+    .quick-btn:active {
+      transform: translateY(-1px) scale(0.98);
+    }
+
+    .quick-btn span,
+    .quick-btn::slotted(*) {
+      position: relative;
+      z-index: 1;
+    }
+
+    .quick-btn.danger {
+      border-color: rgba(239, 68, 68, 0.3);
+      color: var(--danger);
+    }
+
+    .quick-btn.danger:hover {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: var(--danger);
+      box-shadow: 0 8px 24px rgba(239, 68, 68, 0.2);
+    }
+
+    .quick-btn.danger::before {
+      background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
+    }
+
+    /* Chat Area */
+    #chat {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      scroll-behavior: smooth;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border-color) transparent;
+      position: relative;
+    }
+
+    #chat::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    #chat::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    #chat::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 3px;
+    }
+
+    #chat::-webkit-scrollbar-thumb:hover {
+      background: var(--primary);
+    }
+
+    /* Message Bubbles */
+    .bubble {
+      display: flex;
+      gap: 12px;
+      animation: bubbleIn 0.5s var(--transition-bounce);
+      max-width: 85%;
+      position: relative;
+    }
+
+    @keyframes bubbleIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .bubble.user {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+    }
+
+    .bubble.bot {
+      align-self: flex-start;
+    }
+
+    .bubble-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+      position: relative;
+      transition: all var(--transition-fast);
+    }
+
+    .bubble:hover .bubble-avatar {
+      transform: scale(1.1) rotate(5deg);
+    }
+
+    .bubble.user .bubble-avatar {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      box-shadow: 0 4px 16px rgba(139, 92, 246, 0.4);
+    }
+
+    .bubble.bot .bubble-avatar {
+      background: var(--bg-glass);
+      border: 1px solid var(--border-color);
+      backdrop-filter: blur(10px);
+    }
+
+    .bubble-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-width: 100%;
+    }
+
+    .bubble-content {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 14px 18px;
+      line-height: 1.65;
+      font-size: 14px;
+      font-weight: 400;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      position: relative;
+      transition: all var(--transition-fast);
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+
+    .bubble-content:hover {
+      border-color: var(--border-glow);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .bubble.user .bubble-content {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      border: none;
+      border-bottom-right-radius: 6px;
+      color: white;
+      box-shadow: 0 8px 24px rgba(139, 92, 246, 0.3);
+    }
+
+    .bubble.bot .bubble-content {
+      border-bottom-left-radius: 6px;
+    }
+
+    .bubble-meta {
+      font-size: 10px;
+      color: var(--text-muted);
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      padding: 0 4px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Typing Indicator */
+    .bubble.typing .bubble-content {
+      background: rgba(139, 92, 246, 0.1);
+      border-color: var(--primary);
+      min-width: 100px;
+    }
+
+    .typing-dots {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      padding: 8px 0;
+    }
+
+    .typing-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--primary);
+      border-radius: 50%;
+      animation: typingBounce 1.4s ease-in-out infinite;
+    }
+
+    .typing-dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .typing-dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes typingBounce {
+      0%, 60%, 100% { 
+        transform: translateY(0); 
+        opacity: 0.4;
+      }
+      30% { 
+        transform: translateY(-8px); 
+        opacity: 1;
+      }
+    }
+
+    /* Business Cards */
+    .businesses-container {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .business-card {
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(99, 102, 241, 0.04) 100%);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+      transition: all var(--transition-smooth);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .business-card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: linear-gradient(180deg, var(--primary) 0%, var(--accent) 100%);
+      transform: scaleY(0);
+      transition: transform var(--transition-smooth);
+    }
+
+    .business-card:hover {
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.12) 0%, rgba(99, 102, 241, 0.08) 100%);
+      border-color: var(--primary-light);
+      transform: translateX(8px) scale(1.01);
+      box-shadow: 0 8px 32px rgba(139, 92, 246, 0.2);
+    }
+
+    .business-card:hover::before {
+      transform: scaleY(1);
+    }
+
+    .business-card:active {
+      transform: translateX(4px) scale(0.99);
+    }
+
+    .business-card-icon {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+      transition: all var(--transition-fast);
+    }
+
+    .business-card:hover .business-card-icon {
+      transform: rotate(-5deg) scale(1.1);
+    }
+
+    .business-card-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .business-card-name {
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .business-card-details {
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .business-score {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(52, 211, 153, 0.1) 100%);
+      color: var(--success-light);
+      padding: 4px 10px;
+      border-radius: var(--radius-xl);
+      font-size: 11px;
+      font-weight: 600;
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
+    /* Input Area */
+    .input-area {
+      background: linear-gradient(180deg, rgba(17, 17, 40, 0.95) 0%, rgba(17, 17, 40, 0.98) 100%);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid var(--border-color);
+      padding: 16px 20px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-end;
+      position: relative;
+      z-index: 100;
+      animation: slideUp 0.6s var(--transition-bounce) 0.3s both;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(100%);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .input-wrapper {
+      flex: 1;
+      position: relative;
+      display: flex;
+      align-items: flex-end;
+    }
+
+    #msgInput {
+      width: 100%;
+      background: var(--bg-glass);
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      color: var(--text-primary);
+      padding: 14px 18px;
+      padding-right: 50px;
+      font-size: 14px;
+      outline: none;
+      resize: none;
+      max-height: 120px;
+      font-family: inherit;
+      line-height: 1.5;
+      transition: all var(--transition-fast);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    #msgInput:focus {
+      border-color: var(--primary);
+      background: rgba(139, 92, 246, 0.05);
+      box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1), 0 8px 32px rgba(139, 92, 246, 0.15);
+      transform: translateY(-2px);
+    }
+
+    #msgInput::placeholder {
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    .input-actions {
+      position: absolute;
+      right: 12px;
+      bottom: 12px;
+      display: flex;
+      gap: 6px;
+    }
+
+    .input-action-btn {
+      width: 28px;
+      height: 28px;
+      background: transparent;
+      border: none;
+      border-radius: var(--radius-sm);
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      transition: all var(--transition-fast);
+    }
+
+    .input-action-btn:hover {
+      background: var(--bg-glass);
+      color: var(--text-secondary);
+    }
+
+    #sendBtn {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      border: none;
+      border-radius: var(--radius-md);
+      color: white;
+      font-size: 22px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--transition-fast);
+      flex-shrink: 0;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 16px rgba(139, 92, 246, 0.4);
+    }
+
+    #sendBtn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
+      opacity: 0;
+      transition: opacity var(--transition-fast);
+    }
+
+    #sendBtn:hover:not(:disabled) {
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 8px 28px rgba(139, 92, 246, 0.5);
+    }
+
+    #sendBtn:hover:not(:disabled)::before {
+      opacity: 1;
+    }
+
+    #sendBtn:active:not(:disabled) {
+      transform: translateY(-1px) scale(0.97);
+    }
+
+    #sendBtn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    #sendBtn span {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .modal.open {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .modal-content {
+      background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      max-width: 520px;
+      width: 100%;
+      max-height: 85vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-lg), var(--shadow-glow);
+      animation: modalIn 0.4s var(--transition-bounce);
+      position: relative;
+    }
+
+    @keyframes modalIn {
+      from {
+        opacity: 0;
+        transform: scale(0.9) translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 24px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border-color);
+      gap: 16px;
+    }
+
+    .modal-title-group {
+      flex: 1;
+    }
+
+    .modal-header h2 {
+      font-size: 22px;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--text-primary) 0%, var(--primary-light) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 6px;
+      line-height: 1.2;
+    }
+
+    .modal-subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .modal-close {
+      width: 36px;
+      height: 36px;
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      border-radius: var(--radius-sm);
+      color: var(--danger);
+      cursor: pointer;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--transition-fast);
+      flex-shrink: 0;
+    }
+
+    .modal-close:hover {
+      background: rgba(239, 68, 68, 0.2);
+      transform: rotate(90deg);
+    }
+
+    .modal-section {
+      margin-bottom: 20px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .modal-section:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .modal-section-title {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .modal-field {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 14px;
+      font-size: 14px;
+    }
+
+    .modal-field:last-child {
+      margin-bottom: 0;
+    }
+
+    .modal-field-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--bg-glass);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .modal-field-value {
+      flex: 1;
+      padding-top: 8px;
+    }
+
+    .city-name {
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: 15px;
+    }
+
+    .address-text {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      line-height: 1.5;
+    }
+
+    .distance-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(52, 211, 153, 0.1) 100%);
+      color: var(--success-light);
+      padding: 8px 16px;
+      border-radius: var(--radius-xl);
+      font-size: 13px;
+      font-weight: 600;
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
+    .rating-stars {
+      color: #fbbf24;
+      font-size: 16px;
+      letter-spacing: 2px;
+    }
+
+    .rating-value {
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: 15px;
+    }
+
+    .reviews-count {
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    .score-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(167, 139, 250, 0.1) 100%);
+      color: var(--primary-light);
+      padding: 10px 18px;
+      border-radius: var(--radius-xl);
+      font-size: 14px;
+      font-weight: 600;
+      border: 1px solid rgba(139, 92, 246, 0.2);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      :root {
+        --radius-sm: 10px;
+        --radius-md: 14px;
+        --radius-lg: 20px;
+        --radius-xl: 28px;
+      }
+
+      header {
+        padding: 12px 16px;
+        flex-wrap: wrap;
+      }
+
+      .header-info h1 {
+        font-size: 16px;
+      }
+
+      .logo-container {
+        width: 42px;
+        height: 42px;
+      }
+
+      .logo {
+        font-size: 22px;
+      }
+
+      .status-badge {
+        padding: 6px 12px;
+        font-size: 11px;
+      }
+
+      .config-bar {
+        padding: 10px 16px;
+        gap: 10px;
+      }
+
+      .demo-badge {
+        font-size: 10px;
+        padding: 5px 12px;
+      }
+
+      .config-group label {
+        display: none;
+      }
+
+      .config-group select {
+        padding: 8px 28px 8px 12px;
+        font-size: 11px;
+      }
+
+      .quick-actions {
+        padding: 8px 16px;
+        gap: 6px;
+      }
+
+      .quick-btn {
+        padding: 8px 14px;
+        font-size: 11px;
+        border-radius: var(--radius-xl);
+      }
+
+      #chat {
+        padding: 16px;
+        gap: 12px;
+      }
+
+      .bubble {
+        max-width: 92%;
+      }
+
+      .bubble.user {
+        max-width: 88%;
+      }
+
+      .bubble-avatar {
+        width: 34px;
+        height: 34px;
+        font-size: 18px;
+      }
+
+      .bubble-content {
+        padding: 12px 14px;
+        font-size: 13px;
+        border-radius: var(--radius-md);
+      }
+
+      .input-area {
+        padding: 12px 16px;
+        gap: 10px;
+      }
+
+      #msgInput {
+        padding: 12px 14px;
+        padding-right: 46px;
+        font-size: 13px;
+        border-radius: var(--radius-md);
+      }
+
+      #sendBtn {
+        width: 46px;
+        height: 46px;
+        font-size: 20px;
+      }
+
+      .modal-content {
+        padding: 20px;
+        border-radius: var(--radius-md);
+        max-height: 90vh;
+      }
+
+      .modal-header h2 {
+        font-size: 19px;
+      }
+
+      .business-card {
+        padding: 12px 14px;
+      }
+
+      .business-card-icon {
+        width: 38px;
+        height: 38px;
+        font-size: 19px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .header-info p {
+        display: none;
+      }
+
+      .status-badge span:last-child {
+        display: none;
+      }
+
+      .quick-btn {
+        padding: 8px 12px;
+        font-size: 10px;
+      }
+
+      .bubble {
+        max-width: 95%;
+      }
+
+      .bubble.user {
+        max-width: 90%;
+      }
+    }
+
+    /* Safe area for notch devices */
+    @supports (padding: env(safe-area-inset-bottom)) {
+      .input-area {
+        padding-bottom: calc(16px + env(safe-area-inset-bottom));
+      }
+
+      header {
+        padding-top: calc(16px + env(safe-area-inset-top));
+      }
+    }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* Focus visible for accessibility */
+    :focus-visible {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
+    }
+
+    button:focus-visible,
+    select:focus-visible,
+    input:focus-visible {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Animated Background -->
+  <div class="bg-animation">
+    <div class="bg-gradient"></div>
+    <div class="grid-overlay"></div>
+  </div>
+
+  <!-- App Container -->
+  <div class="app-container">
+    <!-- Header -->
+    <header>
+      <div class="header-left">
+        <div class="logo-container">
+          <div class="logo-bg"></div>
+          <div class="logo">🤖</div>
+        </div>
+        <div class="header-info">
+          <h1>Ekthaa AI Assistant</h1>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="status-badge">
+          <div class="status-indicator status-dot" id="statusIndicator"></div>
+          <span id="statusText">Connecting...</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Config Bar -->
+    <div class="config-bar">
+
+      <div class="config-group">
+        <label>Language</label>
+        <select id="lang">
+          <option value="en">English</option>
+          <option value="hi">Hindi (Hinglish)</option>
+          <option value="te">Telugu</option>
+          <option value="ta">Tamil</option>
+          <option value="mr">Marathi</option>
+          <option value="bn">Bengali</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+      <button class="quick-btn" onclick="ask('What is my total due?')">💰 Total Due?</button>
+      <button class="quick-btn" onclick="ask('Which shop do I owe the most?')">🏪 Biggest Debt?</button>
+      <button class="quick-btn" onclick="ask('How much did I spend this month?')">📊 Monthly Spend?</button>
+      <button class="quick-btn" onclick="ask('Give me savings tips')">💡 Save Money Tips</button>
+      <button class="quick-btn" onclick="ask('Show me shops near me')">🗺️ Shops Near Me</button>
+      <button class="quick-btn" onclick="shareLocation()">📍 Share Location</button>
+      <button class="quick-btn" onclick="ask('Tell me a joke')">🃏 Joke Test</button>
+      <button class="quick-btn danger" onclick="clearChat()">🗑️ Clear Chat</button>
+    </div>
+
+    <!-- Chat Area -->
+    <div id="chat">
+      <div class="bubble bot">
+        <div class="bubble-avatar">🤖</div>
+        <div class="bubble-wrapper">
+          <div class="bubble-content">
+            👋 <strong>Hey there!</strong> I'm Ekthaa, your AI assistant. Ask me anything about your dues, transactions, or nearby shops!
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Input Area -->
+    <div class="input-area">
+      <div class="input-wrapper">
+        <textarea 
+          id="msgInput" 
+          placeholder="Ask about your dues, transactions, shops..." 
+          rows="1"
+          onkeydown="handleKeyDown(event)"
+          oninput="autoResize(this)"
+        ></textarea>
+        <div class="input-actions">
+          <button class="input-action-btn" title="Attach file">📎</button>
+        </div>
+      </div>
+      <button id="sendBtn" onclick="send()"><span>📤</span></button>
+    </div>
+  </div>
+
+  <!-- Business Details Modal -->
+  <div id="businessModal" class="modal" onclick="closeModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <h2 id="modalName">Business Name</h2>
+          <div class="modal-subtitle">Business Details</div>
+        </div>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
+      
+      <div class="modal-section">
+        <div class="modal-section-title">📍 Location Information</div>
+        <div class="modal-field">
+          <div class="modal-field-icon">🏢</div>
+          <div class="modal-field-value">
+            <div id="modalCity" class="city-name">City Name</div>
+            <div id="modalAddress" class="address-text">Full address here</div>
+          </div>
+        </div>
+        <div class="modal-field" id="distanceField" style="display: none;">
+          <div class="modal-field-icon">📐</div>
+          <div class="modal-field-value">
+            <div class="distance-badge" id="modalDistance">0 km away</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-section" id="contactSection" style="display: none;">
+        <div class="modal-section-title">📞 Contact Details</div>
+        <div class="modal-field" id="phoneField" style="display: none;">
+          <div class="modal-field-icon">☎️</div>
+          <div class="modal-field-value" id="modalPhone">Phone number</div>
+        </div>
+        <div class="modal-field" id="emailField" style="display: none;">
+          <div class="modal-field-icon">✉️</div>
+          <div class="modal-field-value" id="modalEmail">Email address</div>
+        </div>
+      </div>
+
+      <div class="modal-section" id="ratingSection" style="display: none;">
+        <div class="modal-section-title">⭐ Rating & Reviews</div>
+        <div class="modal-field">
+          <div class="modal-field-icon rating-stars" id="modalStars">⭐⭐⭐⭐⭐</div>
+          <div class="modal-field-value">
+            <span class="rating-value" id="modalRating">5.0</span>
+            <span class="reviews-count" id="modalReviews"> • 0 reviews</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-title">🎯 AI Relevance Score</div>
+        <div class="modal-field">
+          <div class="modal-field-icon">🎯</div>
+          <div class="modal-field-value">
+            <div class="score-badge" id="modalScore">Match: 0%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const BASE = 'http://localhost:5001';
+    let history = [];
+    let userLat = null;
+    let userLng = null;
+    const currentUserId = 'demo_user';
+    let selectedBusiness = null;
+
+    // Calculate distance in km using Haversine formula
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+      const R = 6371;
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+      const a = 
+        Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon/2) * Math.sin(dLon/2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      return R * c;
+    }
+
+    // Auto-resize textarea
+    function autoResize(textarea) {
+      textarea.style.height = 'auto';
+      textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+    }
+
+    // Handle keyboard input
+    function handleKeyDown(event) {
+      if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        send();
+      }
+    }
+
+    // Modal functions
+    function openBusinessDetails(business) {
+      selectedBusiness = business;
+      document.getElementById('modalName').textContent = business.name || 'Unknown Business';
+      document.getElementById('modalCity').textContent = business.city || 'Location not available';
+      document.getElementById('modalAddress').textContent = business.address || 'No address available';
+      document.getElementById('modalPhone').textContent = business.phone || 'Not available';
+      document.getElementById('modalEmail').textContent = business.email || 'Not available';
+      document.getElementById('modalScore').textContent = `Match: ${(business.score * 100).toFixed(0)}%`;
+
+      document.getElementById('contactSection').style.display = 
+        (business.phone || business.email) ? 'block' : 'none';
+      document.getElementById('phoneField').style.display = business.phone ? 'flex' : 'none';
+      document.getElementById('emailField').style.display = business.email ? 'flex' : 'none';
+      
+      if (business.rating && business.rating > 0) {
+        document.getElementById('ratingSection').style.display = 'block';
+        document.getElementById('modalStars').textContent = '⭐'.repeat(Math.round(business.rating));
+        document.getElementById('modalRating').textContent = `${business.rating.toFixed(1)} out of 5`;
+        document.getElementById('modalReviews').textContent = ` • ${business.reviews || 0} reviews`;
+      } else {
+        document.getElementById('ratingSection').style.display = 'none';
+      }
+
+      if (userLat && userLng && business.latitude && business.longitude) {
+        const dist = calculateDistance(userLat, userLng, business.latitude, business.longitude);
+        document.getElementById('distanceField').style.display = 'flex';
+        document.getElementById('modalDistance').textContent = `${dist.toFixed(1)} km away`;
+      } else {
+        document.getElementById('distanceField').style.display = 'none';
+      }
+
+      document.getElementById('businessModal').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal(event) {
+      if (event && event.target.id !== 'businessModal') return;
+      document.getElementById('businessModal').classList.remove('open');
+      selectedBusiness = null;
+      document.body.style.overflow = '';
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeModal();
+    });
+
+    // Health Check
+    async function checkHealth() {
+      try {
+        const response = await fetch(`${BASE}/api/health`);
+        const data = await response.json();
+        if (data.status === 'ok') {
+          document.getElementById('statusIndicator').classList.add('online');
+          document.getElementById('statusText').textContent = 'Online';
+          return true;
+        }
+      } catch (error) {
+        console.error('Health check failed:', error);
+      }
+      document.getElementById('statusIndicator').classList.remove('online');
+      document.getElementById('statusText').textContent = 'Offline';
+      return false;
+    }
+
+    checkHealth();
+    setInterval(checkHealth, 10000);
+
+    // Share Location
+    function shareLocation() {
+      const el = document.querySelector('button[onclick="shareLocation()"]');
+      if (!navigator.geolocation) {
+        addBubble('❌ Geolocation is not supported in your browser.', 'bot');
+        return;
+      }
+
+      el.disabled = true;
+      el.innerHTML = '<span>📍 Locating...</span>';
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          userLat = position.coords.latitude;
+          userLng = position.coords.longitude;
+          el.innerHTML = `<span>📍 ${userLat.toFixed(3)}, ${userLng.toFixed(3)}</span>`;
+          el.style.background = 'linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(52, 211, 153, 0.1) 100%)';
+          el.style.borderColor = 'var(--success)';
+          el.style.color = 'var(--success)';
+          addBubble(`📍 Location shared: <strong>${userLat.toFixed(4)}, ${userLng.toFixed(4)}</strong><br><br>Now ask "Show me shops near me" to find nearby businesses!`, 'bot');
+          el.disabled = false;
+        },
+        (error) => {
+          el.innerHTML = '<span>📍 Share Location</span>';
+          el.disabled = false;
+          addBubble(`❌ Location Error: ${error.message}`, 'bot');
+        },
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 }
+      );
+    }
+
+    // Add Message Bubble
+    function addBubble(text, role, meta = '', businesses = null) {
+      const chatArea = document.getElementById('chat');
+      const div = document.createElement('div');
+      div.className = `bubble ${role}`;
+
+      const avatar = document.createElement('div');
+      avatar.className = 'bubble-avatar';
+      avatar.textContent = role === 'user' ? '👤' : '🤖';
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'bubble-wrapper';
+
+      // Convert basic Markdown to HTML
+      let formattedText = text
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/\n/g, '<br>');
+      
+      const content = document.createElement('div');
+      content.className = 'bubble-content';
+      content.innerHTML = formattedText;
+      wrapper.appendChild(content);
+
+      if (businesses && businesses.length > 0) {
+        const cardsContainer = document.createElement('div');
+        cardsContainer.className = 'businesses-container';
+        
+        businesses.forEach(biz => {
+          const card = document.createElement('div');
+          card.className = 'business-card';
+          
+          const distance = (userLat && userLng && biz.latitude && biz.longitude) 
+            ? `${calculateDistance(userLat, userLng, biz.latitude, biz.longitude).toFixed(1)} km away`
+            : (biz.city ? `📍 ${biz.city}` : '');
+          
+          card.innerHTML = `
+            <div class="business-card-icon">🏪</div>
+            <div class="business-card-content">
+              <div class="business-card-name">${biz.name || 'Unknown Business'}</div>
+              <div class="business-card-details">
+                ${distance ? `<span>${distance}</span>` : ''}
+                ${biz.score ? `<span class="business-score">Match: ${(biz.score * 100).toFixed(0)}%</span>` : ''}
+              </div>
+            </div>
+          `;
+          
+          card.onclick = () => openBusinessDetails(biz);
+          cardsContainer.appendChild(card);
+        });
+        
+        wrapper.appendChild(cardsContainer);
+      }
+
+      if (meta) {
+        const metaDiv = document.createElement('div');
+        metaDiv.className = 'bubble-meta';
+        metaDiv.textContent = meta;
+        wrapper.appendChild(metaDiv);
+      }
+
+      div.appendChild(avatar);
+      div.appendChild(wrapper);
+      chatArea.appendChild(div);
+      
+      requestAnimationFrame(() => {
+        chatArea.scrollTo({
+          top: chatArea.scrollHeight,
+          behavior: 'smooth'
+        });
+      });
+
+      return div;
+    }
+
+    // Add Typing Indicator
+    function addTypingIndicator() {
+      const chatArea = document.getElementById('chat');
+      const div = document.createElement('div');
+      div.className = 'bubble bot typing';
+      div.id = 'typingBubble';
+
+      const avatar = document.createElement('div');
+      avatar.className = 'bubble-avatar';
+      avatar.textContent = '🤖';
+
+      const content = document.createElement('div');
+      content.className = 'bubble-content';
+      content.innerHTML = `
+        <div class="typing-dots">
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+        </div>
+      `;
+
+      div.appendChild(avatar);
+      div.appendChild(content);
+      chatArea.appendChild(div);
+      
+      requestAnimationFrame(() => {
+        chatArea.scrollTo({
+          top: chatArea.scrollHeight,
+          behavior: 'smooth'
+        });
+      });
+
+      return div;
+    }
+
+    // Send Message
+    async function send() {
+      const input = document.getElementById('msgInput');
+      const message = input.value.trim();
+      if (!message) return;
+
+      input.value = '';
+      input.style.height = 'auto';
+      await ask(message);
+    }
+
+    // Ask AI
+    async function ask(message) {
+      const language = document.getElementById('lang').value;
+      addBubble(message, 'user');
+
+      const sendBtn = document.getElementById('sendBtn');
+      sendBtn.disabled = true;
+
+      const typingBubble = addTypingIndicator();
+
+      // Auto-location for "near me" queries if not already shared
+      if ((message.toLowerCase().includes('near me') || message.toLowerCase().includes('shops')) && 
+          !userLat && !userLng && navigator.geolocation) {
+        try {
+          // Attempt a quick location check (silent if fails)
+          await new Promise(resolve => {
+            navigator.geolocation.getCurrentPosition(
+              (pos) => {
+                userLat = pos.coords.latitude;
+                userLng = pos.coords.longitude;
+                // Update the share location button UI
+                const el = document.querySelector('button[onclick="shareLocation()"]');
+                if (el) {
+                  el.innerHTML = `<span>📍 ${userLat.toFixed(3)}, ${userLng.toFixed(3)}</span>`;
+                  el.style.borderColor = 'var(--success)';
+                }
+                resolve();
+              },
+              () => resolve(), // Fallback silently on error/denial
+              { enableHighAccuracy: true, timeout: 5000, maximumAge: 60000 }
+            );
+            setTimeout(resolve, 6000); // Guard timeout
+          });
+        } catch (e) { console.warn("Auto-location failed", e); }
+      }
+
+      try {
+        const startTime = Date.now();
+        const response = await fetch(`${BASE}/api/ai/chat`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            message,
+            language,
+            history,
+            ...(userLat && userLng && { latitude: userLat, longitude: userLng })
+          })
+        });
+
+        const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+        const data = await response.json();
+
+        typingBubble.remove();
+
+        if (data.reply) {
+          addBubble(data.reply, 'bot', `${data.model_used} • ${elapsed}s • ${language.toUpperCase()}`, data.businesses);
+          history.push({ role: 'user', content: message });
+          history.push({ role: 'model', content: data.reply });
+          if (history.length > 20) history = history.slice(-20);
+        } else {
+          addBubble(`❌ Error: ${data.error || 'Unknown error occurred'}`, 'bot');
+        }
+      } catch (error) {
+        typingBubble.remove();
+        addBubble(`❌ Network Error: Unable to connect to server. Please check your connection.`, 'bot');
+      } finally {
+        sendBtn.disabled = false;
+        document.getElementById('msgInput').focus();
+      }
+    }
+
+    // Clear Chat
+    function clearChat() {
+      history = [];
+      const chatArea = document.getElementById('chat');
+      chatArea.innerHTML = '';
+      addBubble('🗑️ Chat history cleared! Ready for a fresh conversation.', 'bot');
+    }
+
+    // Initialize
+    window.addEventListener('load', () => {
+      document.getElementById('msgInput').focus();
+    });
+  </script>
+</body>
+</html>
