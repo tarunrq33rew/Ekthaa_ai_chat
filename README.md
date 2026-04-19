@@ -91,3 +91,5 @@ backend/
 | Groq Llama 3.1 8B | 14,400 req/day | Auto-fallback |
 
 A 20 msgs/user/day soft limit is enforced in-app. Appwrite context is cached 5 min per user.
+
+# Ekthaa_ai_chat
